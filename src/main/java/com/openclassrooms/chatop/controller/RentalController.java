@@ -3,7 +3,6 @@ package com.openclassrooms.chatop.controller;
 import com.openclassrooms.chatop.dto.request.RentalRequest;
 import com.openclassrooms.chatop.dto.response.ApiMessage;
 import com.openclassrooms.chatop.dto.response.RentalDetailResponse;
-import com.openclassrooms.chatop.dto.response.RentalResponse;
 import com.openclassrooms.chatop.dto.response.RentalsResponse;
 import com.openclassrooms.chatop.service.RentalService;
 import jakarta.validation.Valid;
