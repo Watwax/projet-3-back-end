@@ -8,17 +8,19 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleInvalidRequest(MethodArgumentNotValidException exception) {
-        return ResponseEntity.badRequest().body(new ApiError("error"));
+    public ResponseEntity<Map<String, String>> handleInvalidRequest(MethodArgumentNotValidException exception) {
+        return ResponseEntity.badRequest().body(Map.of());
     }
 
     @ExceptionHandler(EmailAlreadyRegisteredException.class)
-    public ResponseEntity<ApiError> handleRegisteredEmail(EmailAlreadyRegisteredException exception) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("error"));
+    public ResponseEntity<Map<String, String>> handleRegisteredEmail(EmailAlreadyRegisteredException exception) {
+        return ResponseEntity.badRequest().body(Map.of());
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -42,8 +44,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidRequestException.class)
-    public ResponseEntity<ApiError> handleInvalidInput(InvalidRequestException exception) {
-        return ResponseEntity.badRequest().body(new ApiError("error"));
+    public ResponseEntity<Map<String, String>> handleInvalidInput(InvalidRequestException exception) {
+        return ResponseEntity.badRequest().body(Map.of());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

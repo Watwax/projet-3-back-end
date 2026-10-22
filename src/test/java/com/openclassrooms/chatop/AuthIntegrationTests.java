@@ -121,24 +121,24 @@ class AuthIntegrationTests {
     void registerRejectsInvalidAndDuplicateEmails() throws Exception {
         register("", "Test User", PASSWORD)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("error"));
+                .andExpect(content().json("{}"));
 
         register(EMAIL, "Test User", PASSWORD).andExpect(status().isOk());
         register(EMAIL, "Another User", PASSWORD)
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("error"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{}"));
     }
 
     @Test
     void allOtherRoutesRequireAValidBearerToken() throws Exception {
         mockMvc.perform(get("/api/rentals"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("error"));
+                .andExpect(content().string(""));
 
         mockMvc.perform(get("/api/auth/me")
                         .header("Authorization", "Bearer invalid-token"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("error"));
+                .andExpect(content().json("{}"));
     }
 
     @Test
@@ -168,7 +168,7 @@ class AuthIntegrationTests {
                 .andExpect(jsonPath("$.rentals[0].surface").value(42.5))
                 .andExpect(jsonPath("$.rentals[0].price").value(1200.0))
                 .andExpect(jsonPath("$.rentals[0].owner_id").value(owner.getId()))
-                .andExpect(jsonPath("$.rentals[0].created_at").value("2026-01-01T12:00:00"))
+                .andExpect(jsonPath("$.rentals[0].created_at").value("2026/01/01"))
                 .andExpect(jsonPath("$.rentals[0].owner").doesNotExist());
     }
 
@@ -186,7 +186,7 @@ class AuthIntegrationTests {
                         .param("price", "1200")
                         .param("description", "Description du logement")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Rental created !"))
                 .andReturn();
 
@@ -196,7 +196,9 @@ class AuthIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(rental.getId()))
                 .andExpect(jsonPath("$.owner_id").value(userRepository.findByEmail(EMAIL).orElseThrow().getId()))
-                .andExpect(jsonPath("$.picture").value(rental.getPicture()));
+                .andExpect(jsonPath("$.picture").value(rental.getPicture()))
+                .andExpect(jsonPath("$.created_at")
+                        .value(rental.getCreatedAt().toLocalDate().toString().replace("-", "/")));
 
         mockMvc.perform(get(rental.getPicture()))
                 .andExpect(status().isOk())
@@ -301,7 +303,7 @@ class AuthIntegrationTests {
                         .param("description", "Description du logement")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("error"));
+                .andExpect(content().json("{}"));
         assertTrue(rentalRepository.findAll().isEmpty());
     }
 

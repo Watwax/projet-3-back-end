@@ -1,6 +1,7 @@
 package com.openclassrooms.chatop.service;
 
 import com.openclassrooms.chatop.dto.request.RentalRequest;
+import com.openclassrooms.chatop.dto.response.RentalDetailResponse;
 import com.openclassrooms.chatop.dto.response.RentalResponse;
 import com.openclassrooms.chatop.dto.response.RentalsResponse;
 import com.openclassrooms.chatop.entity.Rental;
@@ -42,9 +43,9 @@ public class RentalService {
     }
 
     @Transactional(readOnly = true)
-    public RentalResponse getRental(Integer id) {
+    public RentalDetailResponse getRental(Integer id) {
         return rentalRepository.findById(id)
-                .map(RentalResponse::from)
+                .map(RentalDetailResponse::from)
                 .orElseThrow(RentalNotFoundException::new);
     }
 

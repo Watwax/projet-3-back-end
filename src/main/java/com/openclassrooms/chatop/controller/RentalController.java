@@ -2,11 +2,11 @@ package com.openclassrooms.chatop.controller;
 
 import com.openclassrooms.chatop.dto.request.RentalRequest;
 import com.openclassrooms.chatop.dto.response.ApiMessage;
+import com.openclassrooms.chatop.dto.response.RentalDetailResponse;
 import com.openclassrooms.chatop.dto.response.RentalResponse;
 import com.openclassrooms.chatop.dto.response.RentalsResponse;
 import com.openclassrooms.chatop.service.RentalService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +33,7 @@ public class RentalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RentalResponse> getRental(@PathVariable Integer id) {
+    public ResponseEntity<RentalDetailResponse> getRental(@PathVariable Integer id) {
         return ResponseEntity.ok(rentalService.getRental(id));
     }
 
@@ -42,9 +42,8 @@ public class RentalController {
             @Valid @ModelAttribute RentalRequest request,
             Authentication authentication
     ) {
-        rentalService.createRental(request, authentication.getName());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiMessage("Rental created !"));
+            rentalService.createRental(request, authentication.getName());
+            return ResponseEntity.ok(new ApiMessage("Rental created !"));
     }
 
     @PutMapping("/{id}")

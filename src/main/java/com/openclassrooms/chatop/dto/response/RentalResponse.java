@@ -1,6 +1,7 @@
 package com.openclassrooms.chatop.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.openclassrooms.chatop.entity.Rental;
 
 import java.math.BigDecimal;
@@ -14,8 +15,8 @@ public record RentalResponse(
         String picture,
         String description,
         @JsonProperty("owner_id") Integer ownerId,
-        @JsonProperty("created_at") LocalDateTime createdAt,
-        @JsonProperty("updated_at") LocalDateTime updatedAt
+        @JsonProperty("created_at") @JsonFormat(pattern = "yyyy/MM/dd") LocalDateTime createdAt,
+        @JsonProperty("updated_at") @JsonFormat(pattern = "yyyy/MM/dd") LocalDateTime updatedAt
 ) {
 
     public static RentalResponse from(Rental rental) {
