@@ -15,3 +15,7 @@ Les tables doivent déjà exister dans la base : Hibernate vérifie leur structu
 ## Authentification
 
 Les routes `POST /api/auth/register` et `POST /api/auth/login` sont publiques et renvoient un JWT dans un objet `{ "token": "..." }`. Toutes les autres routes nécessitent `Authorization: Bearer <token>`. La route `GET /api/auth/me` renvoie les informations publiques de l'utilisateur authentifié.
+
+## Locations
+
+La route `GET /api/rentals` renvoie les locations sous la forme `{ "rentals": [...] }`. Elle nécessite un JWT valide. Les locations sont sérialisées en DTO afin de ne pas exposer directement les entités JPA.

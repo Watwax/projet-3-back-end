@@ -2,7 +2,9 @@ package com.openclassrooms.chatop;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openclassrooms.chatop.entity.Rental;
 import com.openclassrooms.chatop.entity.User;
+import com.openclassrooms.chatop.repository.RentalRepository;
 import com.openclassrooms.chatop.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,10 +50,14 @@ class AuthIntegrationTests {
     private UserRepository userRepository;
 
     @Autowired
+    private RentalRepository rentalRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void clearUsers() {
+        rentalRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -121,6 +130,37 @@ class AuthIntegrationTests {
                         .header("Authorization", "Bearer invalid-token"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("error"));
+    }
+
+    @Test
+    void getRentalsReturnsRentalDetailsForAuthenticatedUser() throws Exception {
+        MvcResult registerResult = register(EMAIL, "Test User", PASSWORD)
+                .andExpect(status().isOk())
+                .andReturn();
+        User owner = userRepository.findByEmail(EMAIL).orElseThrow();
+
+        Rental rental = new Rental();
+        rental.setName("Appartement lumineux");
+        rental.setSurface(new BigDecimal("42.50"));
+        rental.setPrice(new BigDecimal("1200.00"));
+        rental.setPicture("https://example.com/rental.jpg");
+        rental.setDescription("Un appartement de test");
+        rental.setOwner(owner);
+        rental.setCreatedAt(LocalDateTime.parse("2026-01-01T12:00:00"));
+        rental.setUpdatedAt(LocalDateTime.parse("2026-01-02T12:00:00"));
+        rentalRepository.save(rental);
+
+        mockMvc.perform(get("/api/rentals")
+                        .header("Authorization", "Bearer " + tokenFrom(registerResult)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rentals.length()").value(1))
+                .andExpect(jsonPath("$.rentals[0].id").value(rental.getId()))
+                .andExpect(jsonPath("$.rentals[0].name").value("Appartement lumineux"))
+                .andExpect(jsonPath("$.rentals[0].surface").value(42.5))
+                .andExpect(jsonPath("$.rentals[0].price").value(1200.0))
+                .andExpect(jsonPath("$.rentals[0].owner_id").value(owner.getId()))
+                .andExpect(jsonPath("$.rentals[0].created_at").value("2026-01-01T12:00:00"))
+                .andExpect(jsonPath("$.rentals[0].owner").doesNotExist());
     }
 
     private ResultActions register(
