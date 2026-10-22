@@ -47,7 +47,7 @@ Placer la clé générée dans `JWT_SECRET`. Le fichier `.env` n'est pas version
 | `JWT_EXPIRATION_MS` | Durée de validité du JWT en millisecondes | `3600000` |
 | `UPLOAD_DIR` | Dossier de stockage des images (facultatif) | `uploads` |
 
-Les locations utilisent une surface et un prix entiers, conformément au contrat API.
+Les champs `surface` et `price` sont des entiers dans le contrat HTTP. Ils sont persistés en colonnes `NUMERIC` pour correspondre au schéma MySQL existant.
 
 ## Lancement et tests
 
@@ -67,8 +67,8 @@ L'API écoute par défaut sur `http://localhost:8080`.
 
 ## Documentation Swagger / OpenAPI
 
-- Interface interactive : [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
-- Spécification OpenAPI JSON : [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+- Interface interactive : [http://localhost:8080/api/swagger](http://localhost:8080/api/swagger)
+- Spécification OpenAPI JSON : [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi)
 
 Les routes protégées proposent le schéma Bearer JWT dans Swagger : utiliser **Authorize** et fournir le token. Les routes d'inscription et de connexion sont publiques.
 

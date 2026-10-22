@@ -11,8 +11,8 @@ CREATE TABLE `USERS` (
 CREATE TABLE `RENTALS` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `surface` integer NOT NULL,
-  `price` integer NOT NULL,
+  `surface` numeric NOT NULL,
+  `price` numeric NOT NULL,
   `picture` varchar(255) NOT NULL,
   `description` varchar(2000) NOT NULL,
   `owner_id` integer NOT NULL,

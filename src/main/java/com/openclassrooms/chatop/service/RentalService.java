@@ -14,6 +14,7 @@ import com.openclassrooms.chatop.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -83,8 +84,8 @@ public class RentalService {
 
     private void updateRentalFields(Rental rental, RentalRequest request) {
         rental.setName(request.getName().trim());
-        rental.setSurface(request.getSurface());
-        rental.setPrice(request.getPrice());
+        rental.setSurface(BigDecimal.valueOf(request.getSurface()));
+        rental.setPrice(BigDecimal.valueOf(request.getPrice()));
         rental.setDescription(request.getDescription().trim());
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -149,8 +151,8 @@ class AuthIntegrationTests {
 
         Rental rental = new Rental();
         rental.setName("Appartement lumineux");
-        rental.setSurface(42);
-        rental.setPrice(1200);
+        rental.setSurface(new BigDecimal("42.00"));
+        rental.setPrice(new BigDecimal("1200.00"));
         rental.setPicture("https://example.com/rental.jpg");
         rental.setDescription("Un appartement de test");
         rental.setOwner(owner);
@@ -232,8 +234,8 @@ class AuthIntegrationTests {
 
         Rental rental = new Rental();
         rental.setName("Appartement test");
-        rental.setSurface(42);
-        rental.setPrice(1200);
+        rental.setSurface(new BigDecimal("42.00"));
+        rental.setPrice(new BigDecimal("1200.00"));
         rental.setPicture("/uploads/test.png");
         rental.setDescription("Description");
         rental.setOwner(owner);
@@ -331,7 +333,14 @@ class AuthIntegrationTests {
 
     @Test
     void swaggerDocumentsAllApiRoutesAndIsPubliclyAccessible() throws Exception {
-        mockMvc.perform(get("/v3/api-docs"))
+        mockMvc.perform(get("/api/swagger"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/api/swagger-ui/index.html"));
+
+        mockMvc.perform(get("/api/swagger-ui/index.html"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/openapi"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paths['/api/auth/register'].post").exists())
                 .andExpect(jsonPath("$.paths['/api/auth/login'].post").exists())
@@ -354,6 +363,10 @@ class AuthIntegrationTests {
                 ).value("#/components/schemas/RentalRequest"))
                 .andExpect(jsonPath("$.components.schemas.RentalRequest.properties.picture.format")
                         .value("binary"));
+
+        mockMvc.perform(get("/api/openapi/swagger-config"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.url").value("/api/openapi"));
     }
 
     private ResultActions register(

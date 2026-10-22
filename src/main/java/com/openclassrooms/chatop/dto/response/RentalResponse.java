@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.openclassrooms.chatop.entity.Rental;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record RentalResponse(
@@ -22,13 +23,17 @@ public record RentalResponse(
         return new RentalResponse(
                 rental.getId(),
                 rental.getName(),
-                rental.getSurface(),
-                rental.getPrice(),
+                integerValue(rental.getSurface()),
+                integerValue(rental.getPrice()),
                 rental.getPicture(),
                 rental.getDescription(),
                 rental.getOwner().getId(),
                 rental.getCreatedAt(),
                 rental.getUpdatedAt()
         );
+    }
+
+    private static Integer integerValue(BigDecimal value) {
+        return value == null ? null : value.intValueExact();
     }
 }

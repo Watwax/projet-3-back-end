@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,9 +30,9 @@ public class Rental {
     @Column(length = 255)
     private String name;
 
-    private Integer surface;
+    private BigDecimal surface;
 
-    private Integer price;
+    private BigDecimal price;
 
     @Column(length = 255)
     private String picture;
