@@ -31,6 +31,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError("error"));
     }
 
+    @ExceptionHandler(RentalNotFoundException.class)
+    public ResponseEntity<ApiError> handleMissingRental(RentalNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError("error"));
+    }
+
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ApiError> handleForbiddenOperation(ForbiddenOperationException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiError("error"));
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ApiError> handleInvalidInput(InvalidRequestException exception) {
+        return ResponseEntity.badRequest().body(new ApiError("error"));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("error"));

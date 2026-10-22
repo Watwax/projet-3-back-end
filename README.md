@@ -16,6 +16,19 @@ Les tables doivent déjà exister dans la base : Hibernate vérifie leur structu
 
 Les routes `POST /api/auth/register` et `POST /api/auth/login` sont publiques et renvoient un JWT dans un objet `{ "token": "..." }`. Toutes les autres routes nécessitent `Authorization: Bearer <token>`. La route `GET /api/auth/me` renvoie les informations publiques de l'utilisateur authentifié.
 
-## Locations
+## Routes REST
 
-La route `GET /api/rentals` renvoie les locations sous la forme `{ "rentals": [...] }`. Elle nécessite un JWT valide. Les locations sont sérialisées en DTO afin de ne pas exposer directement les entités JPA.
+Toutes les routes `/api/**` nécessitent un JWT valide, à l'exception de `POST /api/auth/register` et `POST /api/auth/login`. `GET /api/auth/me` renvoie les informations publiques de l'utilisateur authentifié.
+
+| Méthode | Route | Résultat |
+| --- | --- | --- |
+| `GET` | `/api/rentals` | Liste des locations sous la forme `{ "rentals": [...] }` |
+| `GET` | `/api/rentals/{id}` | Détail d'une location |
+| `POST` | `/api/rentals` | Création d'une location (`multipart/form-data`) |
+| `PUT` | `/api/rentals/{id}` | Mise à jour d'une location (`multipart/form-data`) |
+| `POST` | `/api/messages` | Envoi d'un message à propos d'une location |
+| `GET` | `/api/user/{id}` | Informations publiques d'un utilisateur |
+
+La création d'une location attend les champs `name`, `surface`, `price`, `description` et le fichier `picture`. La mise à jour accepte les mêmes champs ; l'image est conservée si `picture` est omis. Les fichiers JPEG, PNG et GIF de 10 Mo maximum sont stockés dans `uploads/` par défaut ; la variable `UPLOAD_DIR` permet de choisir un autre répertoire. Les images sont accessibles sous `/uploads/`.
+
+Les réponses de location et d'utilisateur utilisent des DTO et n'exposent pas directement les entités JPA ni les mots de passe. Le propriétaire d'une location et l'auteur d'un message sont contrôlés par rapport au JWT ; les identifiants fournis par le client ne permettent pas d'agir au nom d'un autre utilisateur.
