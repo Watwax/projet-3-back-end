@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -150,8 +149,8 @@ class AuthIntegrationTests {
 
         Rental rental = new Rental();
         rental.setName("Appartement lumineux");
-        rental.setSurface(new BigDecimal("42.50"));
-        rental.setPrice(new BigDecimal("1200.00"));
+        rental.setSurface(42);
+        rental.setPrice(1200);
         rental.setPicture("https://example.com/rental.jpg");
         rental.setDescription("Un appartement de test");
         rental.setOwner(owner);
@@ -165,8 +164,8 @@ class AuthIntegrationTests {
                 .andExpect(jsonPath("$.rentals.length()").value(1))
                 .andExpect(jsonPath("$.rentals[0].id").value(rental.getId()))
                 .andExpect(jsonPath("$.rentals[0].name").value("Appartement lumineux"))
-                .andExpect(jsonPath("$.rentals[0].surface").value(42.5))
-                .andExpect(jsonPath("$.rentals[0].price").value(1200.0))
+                .andExpect(jsonPath("$.rentals[0].surface").value(42))
+                .andExpect(jsonPath("$.rentals[0].price").value(1200))
                 .andExpect(jsonPath("$.rentals[0].owner_id").value(owner.getId()))
                 .andExpect(jsonPath("$.rentals[0].created_at").value("2026/01/01"))
                 .andExpect(jsonPath("$.rentals[0].owner").doesNotExist());
@@ -182,7 +181,7 @@ class AuthIntegrationTests {
         mockMvc.perform(multipart("/api/rentals")
                         .file(validPng())
                         .param("name", "Appartement test")
-                        .param("surface", "42.5")
+                        .param("surface", "42")
                         .param("price", "1200")
                         .param("description", "Description du logement")
                         .header("Authorization", "Bearer " + token))
@@ -233,8 +232,8 @@ class AuthIntegrationTests {
 
         Rental rental = new Rental();
         rental.setName("Appartement test");
-        rental.setSurface(new BigDecimal("42"));
-        rental.setPrice(new BigDecimal("1200"));
+        rental.setSurface(42);
+        rental.setPrice(1200);
         rental.setPicture("/uploads/test.png");
         rental.setDescription("Description");
         rental.setOwner(owner);
@@ -298,7 +297,7 @@ class AuthIntegrationTests {
                                 "not an image".getBytes()
                         ))
                         .param("name", "Appartement test")
-                        .param("surface", "42.5")
+                        .param("surface", "42")
                         .param("price", "1200")
                         .param("description", "Description du logement")
                         .header("Authorization", "Bearer " + token))

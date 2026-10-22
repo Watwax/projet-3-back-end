@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.openclassrooms.chatop.entity.Rental;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record RentalResponse(
         Integer id,
         String name,
-        BigDecimal surface,
-        BigDecimal price,
+        Integer surface,
+        Integer price,
         String picture,
         String description,
         @JsonProperty("owner_id") Integer ownerId,

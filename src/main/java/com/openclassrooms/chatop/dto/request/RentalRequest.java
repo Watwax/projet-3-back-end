@@ -1,12 +1,11 @@
 package com.openclassrooms.chatop.dto.request;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
 
 public class RentalRequest {
 
@@ -15,12 +14,12 @@ public class RentalRequest {
     private String name;
 
     @NotNull
-    @DecimalMin(value = "0.0", inclusive = false)
-    private BigDecimal surface;
+    @Positive
+    private Integer surface;
 
     @NotNull
-    @DecimalMin("0.0")
-    private BigDecimal price;
+    @PositiveOrZero
+    private Integer price;
 
     private MultipartFile picture;
 
@@ -36,19 +35,19 @@ public class RentalRequest {
         this.name = name;
     }
 
-    public BigDecimal getSurface() {
+    public Integer getSurface() {
         return surface;
     }
 
-    public void setSurface(BigDecimal surface) {
+    public void setSurface(Integer surface) {
         this.surface = surface;
     }
 
-    public BigDecimal getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
