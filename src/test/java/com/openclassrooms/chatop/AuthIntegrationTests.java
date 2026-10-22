@@ -329,6 +329,33 @@ class AuthIntegrationTests {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void swaggerDocumentsAllApiRoutesAndIsPubliclyAccessible() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paths['/api/auth/register'].post").exists())
+                .andExpect(jsonPath("$.paths['/api/auth/login'].post").exists())
+                .andExpect(jsonPath("$.paths['/api/auth/me'].get").exists())
+                .andExpect(jsonPath("$.paths['/api/rentals'].get").exists())
+                .andExpect(jsonPath("$.paths['/api/rentals'].post").exists())
+                .andExpect(jsonPath("$.paths['/api/rentals/{id}'].get").exists())
+                .andExpect(jsonPath("$.paths['/api/rentals/{id}'].put").exists())
+                .andExpect(jsonPath("$.paths['/api/messages'].post").exists())
+                .andExpect(jsonPath("$.paths['/api/user/{id}'].get").exists())
+                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
+                .andExpect(jsonPath("$.paths['/api/rentals'].get.security[0].bearerAuth").exists())
+                .andExpect(jsonPath("$.paths['/api/auth/register'].post.security").doesNotExist())
+                .andExpect(jsonPath(
+                        "$.paths['/api/auth/register'].post.responses['200'].content['application/json'].schema.$ref"
+                ).value("#/components/schemas/TokenResponse"))
+                .andExpect(jsonPath(
+                        "$.paths['/api/rentals'].post.requestBody.content['multipart/form-data']"
+                                + ".schema.$ref"
+                ).value("#/components/schemas/RentalRequest"))
+                .andExpect(jsonPath("$.components.schemas.RentalRequest.properties.picture.format")
+                        .value("binary"));
+    }
+
     private ResultActions register(
             String email,
             String name,

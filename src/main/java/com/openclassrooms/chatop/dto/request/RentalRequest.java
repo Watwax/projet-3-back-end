@@ -5,24 +5,30 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.web.multipart.MultipartFile;
 
 public class RentalRequest {
 
+    @Schema(description = "Nom de la location", example = "Appartement lumineux")
     @NotBlank
     @Size(max = 255)
     private String name;
 
+    @Schema(description = "Surface en mètres carrés", example = "42")
     @NotNull
     @Positive
     private Integer surface;
 
+    @Schema(description = "Prix par nuit", example = "120")
     @NotNull
     @PositiveOrZero
     private Integer price;
 
+    @Schema(description = "Fichier image JPEG, PNG ou GIF", type = "string", format = "binary")
     private MultipartFile picture;
 
+    @Schema(description = "Description de la location", example = "Appartement proche du centre")
     @NotBlank
     @Size(max = 2000)
     private String description;

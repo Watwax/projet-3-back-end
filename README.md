@@ -1,36 +1,91 @@
-# projet-3-back-end
+# ChâTop — API backend
 
-## Connexion à la base de données locale
+API REST de gestion des locations, des utilisateurs et des messages. Le backend utilise Java 17, Spring Boot, Spring Data JPA, MySQL et des JWT.
 
-L'application utilise MySQL. Créer un fichier `.env` à la racine du projet à partir de `.env.example`, puis renseigner l'URL de la base et les identifiants. Générer une clé JWT avec `openssl rand -base64 32` et coller la sortie comme valeur de `JWT_SECRET`. Le fichier `.env` est ignoré par Git.
+## Prérequis
 
-Lance ensuite l'application avec :
+- Java 17
+- MySQL 8+
+- Git
+
+## Installation
+
+```bash
+git clone https://github.com/Watwax/projet-3-back-end.git
+cd projet-3-back-end
+```
+
+Créer la base et les tables :
+
+```sql
+CREATE DATABASE chatop_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Depuis la racine du projet, importer le schéma fourni :
+
+```bash
+mysql -u root -p chatop_db < database/schema.sql
+```
+
+Créer le fichier `.env` à la racine en copiant `.env.example`, puis renseigner les paramètres MySQL et générer une clé JWT :
+
+```bash
+cp .env.example .env
+openssl rand -base64 32
+```
+
+Placer la clé générée dans `JWT_SECRET`. Le fichier `.env` n'est pas versionné. Les tables doivent être créées avant le démarrage ; Hibernate vérifie le schéma (`ddl-auto=validate`) et ne le modifie pas.
+
+## Configuration
+
+| Variable | Description | Exemple |
+| --- | --- | --- |
+| `DB_URL` | URL JDBC de MySQL | `jdbc:mysql://localhost:3306/chatop_db` |
+| `DB_USERNAME` | Utilisateur MySQL | `chatop_user` |
+| `DB_PASSWORD` | Mot de passe MySQL | — |
+| `JWT_SECRET` | Clé de signature en Base64 (32 octets minimum) | `openssl rand -base64 32` |
+| `JWT_EXPIRATION_MS` | Durée de validité du JWT en millisecondes | `3600000` |
+| `UPLOAD_DIR` | Dossier de stockage des images (facultatif) | `uploads` |
+
+Les locations utilisent une surface et un prix entiers, conformément au contrat API.
+
+## Lancement et tests
+
+À la racine du dépôt :
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Les tables doivent déjà exister dans la base : Hibernate vérifie leur structure au démarrage sans la modifier (`ddl-auto=validate`).
+Exécuter les tests :
 
-## Authentification
+```bash
+./mvnw test
+```
 
-Les routes `POST /api/auth/register` et `POST /api/auth/login` sont publiques et renvoient un JWT dans un objet `{ "token": "..." }`. Toutes les autres routes nécessitent `Authorization: Bearer <token>`. La route `GET /api/auth/me` renvoie les informations publiques de l'utilisateur authentifié.
+L'API écoute par défaut sur `http://localhost:8080`.
 
-## Routes REST
+## Documentation Swagger / OpenAPI
 
-Toutes les routes `/api/**` nécessitent un JWT valide, à l'exception de `POST /api/auth/register` et `POST /api/auth/login`. `GET /api/auth/me` renvoie les informations publiques de l'utilisateur authentifié.
+- Interface interactive : [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+- Spécification OpenAPI JSON : [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
-| Méthode | Route | Résultat |
+Les routes protégées proposent le schéma Bearer JWT dans Swagger : utiliser **Authorize** et fournir le token. Les routes d'inscription et de connexion sont publiques.
+
+## Routes
+
+| Méthode | Route | Accès |
 | --- | --- | --- |
-| `GET` | `/api/rentals` | Liste des locations sous la forme `{ "rentals": [...] }` |
-| `GET` | `/api/rentals/{id}` | Détail d'une location, avec l'URL de l'image dans `picture` |
-| `POST` | `/api/rentals` | Création d'une location (`multipart/form-data`), réponse HTTP 200 |
-| `PUT` | `/api/rentals/{id}` | Mise à jour d'une location (`multipart/form-data`) |
-| `POST` | `/api/messages` | Envoi d'un message à propos d'une location |
-| `GET` | `/api/user/{id}` | Informations publiques d'un utilisateur |
+| `POST` | `/api/auth/register` | Public |
+| `POST` | `/api/auth/login` | Public |
+| `GET` | `/api/auth/me` | JWT |
+| `GET` | `/api/rentals` | JWT |
+| `GET` | `/api/rentals/{id}` | JWT |
+| `POST` | `/api/rentals` | JWT |
+| `PUT` | `/api/rentals/{id}` | JWT |
+| `POST` | `/api/messages` | JWT |
+| `GET` | `/api/user/{id}` | JWT |
 
-La création d'une location attend les champs `name`, `surface`, `price`, `description` et le fichier `picture`. La mise à jour accepte les mêmes champs ; l'image est conservée si `picture` est omis. Les fichiers JPEG, PNG et GIF de 10 Mo maximum sont stockés dans `uploads/` par défaut ; la variable `UPLOAD_DIR` permet de choisir un autre répertoire. Le chemin `/uploads/<nom>` est enregistré dans la colonne `picture` et renvoyé par l'API comme URL de l'image. En développement, le proxy Angular relaie également `/uploads/**` au backend.
+La création d'une location utilise `multipart/form-data` avec `name`, `surface`, `price`, `description` et le fichier `picture`. Les images JPEG, PNG et GIF (10 Mo maximum) sont enregistrées dans `UPLOAD_DIR`; leur chemin `/uploads/<nom>` est stocké dans la base. Pour le développement avec Angular, le proxy doit relayer `/api/**` et `/uploads/**` vers le backend.
 
-Les réponses de location et d'utilisateur utilisent des DTO et n'exposent pas directement les entités JPA ni les mots de passe. Le propriétaire d'une location et l'auteur d'un message sont contrôlés par rapport au JWT ; les identifiants fournis par le client ne permettent pas d'agir au nom d'un autre utilisateur.
-
-Les dates des réponses suivent le format Mockoon `yyyy/MM/dd`. Les réponses d'authentification refusée sont vides sur les routes privées, sauf `GET /api/auth/me` qui renvoie `{}` ; une erreur de connexion renvoie `{"message":"error"}` et les corps invalides renvoient `{}` avec le statut 400.
+Les mots de passe ne sont jamais renvoyés par l'API. Le propriétaire d'une location est déduit du JWT lors de la création et seul ce propriétaire peut la modifier. L'identité de l'auteur d'un message est vérifiée par rapport au JWT.
