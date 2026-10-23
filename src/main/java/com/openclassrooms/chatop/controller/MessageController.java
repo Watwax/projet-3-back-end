@@ -32,6 +32,13 @@ public class MessageController {
         this.messageService = messageService;
     }
 
+    /**
+     * Envoie un message en vérifiant l'identité de son auteur.
+     *
+     * @param request contenu et location du message
+     * @param authentication identité fournie par le JWT
+     * @return confirmation de l'envoi
+     */
     @PostMapping
     @Operation(summary = "Envoyer un message")
     @ApiResponses({

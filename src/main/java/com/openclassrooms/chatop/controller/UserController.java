@@ -29,6 +29,12 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Renvoie les informations publiques d'un utilisateur.
+     *
+     * @param id identifiant de l'utilisateur
+     * @return les informations publiques de l'utilisateur
+     */
     @GetMapping("/{id}")
     @Operation(summary = "Récupérer un utilisateur")
     @ApiResponses({

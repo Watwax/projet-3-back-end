@@ -33,6 +33,7 @@ public class AuthController {
         this.authService = authService;
     }
 
+    /** Inscrit un utilisateur et renvoie son jeton d'authentification. */
     @PostMapping("/register")
     @Operation(summary = "Créer un compte", description = "Crée un compte et renvoie un JWT.")
     @ApiResponses({
@@ -50,6 +51,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(request));
     }
 
+    /** Authentifie un utilisateur et renvoie son jeton d'authentification. */
     @PostMapping("/login")
     @Operation(summary = "Se connecter", description = "Authentifie l'utilisateur et renvoie un JWT.")
     @ApiResponses({
@@ -68,6 +70,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    /** Renvoie le profil de l'utilisateur associé au jeton courant. */
     @GetMapping("/me")
     @Operation(
             summary = "Récupérer le profil courant",

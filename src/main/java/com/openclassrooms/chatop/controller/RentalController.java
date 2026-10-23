@@ -38,6 +38,7 @@ public class RentalController {
         this.rentalService = rentalService;
     }
 
+    /** Renvoie la liste des locations. */
     @GetMapping
     @Operation(summary = "Lister les locations")
     @ApiResponses({
@@ -55,6 +56,12 @@ public class RentalController {
         return ResponseEntity.ok(rentalService.getAllRentals());
     }
 
+    /**
+     * Renvoie le détail d'une location.
+     *
+     * @param id identifiant de la location
+     * @return le détail de la location
+     */
     @GetMapping("/{id}")
     @Operation(summary = "Récupérer une location")
     @ApiResponses({
@@ -76,6 +83,13 @@ public class RentalController {
         return ResponseEntity.ok(rentalService.getRental(id));
     }
 
+    /**
+     * Crée une location pour l'utilisateur authentifié.
+     *
+     * @param request données et image de la location
+     * @param authentication identité fournie par le JWT
+     * @return confirmation de la création
+     */
     @PostMapping
     @Operation(
             summary = "Créer une location",
@@ -108,6 +122,14 @@ public class RentalController {
         return ResponseEntity.ok(new ApiMessage("Rental created !"));
     }
 
+    /**
+     * Met à jour une location appartenant à l'utilisateur authentifié.
+     *
+     * @param id identifiant de la location
+     * @param request nouvelles données de la location
+     * @param authentication identité fournie par le JWT
+     * @return confirmation de la mise à jour
+     */
     @PutMapping("/{id}")
     @Operation(
             summary = "Modifier une location",

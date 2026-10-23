@@ -65,6 +65,14 @@ Exécuter les tests :
 
 L'API écoute par défaut sur `http://localhost:8080`.
 
+## Organisation et propreté du code
+
+- Les contrôleurs se limitent au contrat HTTP : validation des entrées, lecture de l'identité authentifiée et délégation aux services. Chaque méthode publique d'endpoint possède un commentaire JavaDoc ; les annotations OpenAPI décrivent aussi le contrat de l'API.
+- Les services portent les cas d'usage métier et sont séparés par domaine (`AuthService`, `RentalService`, `MessageService`, `UserService`). Le stockage des images est isolé dans `RentalPictureStorage`.
+- Les contrôleurs appellent les services, qui utilisent les repositories pour l'accès aux données. L'injection par constructeur et les champs `final` rendent les dépendances explicites, les DTO séparent les contrats HTTP des entités JPA.
+- Les points d'entrée et composants sont reliés à leurs usages. Lombok est limité aux entités pour générer les accesseurs et le constructeur sans argument requis par JPA.
+- La suite de tests peut être relancée avec `./mvnw test` pour vérifier que ces séparations préservent le comportement.
+
 ## Documentation Swagger / OpenAPI
 
 - Interface interactive : [http://localhost:8080/api/swagger](http://localhost:8080/api/swagger)
