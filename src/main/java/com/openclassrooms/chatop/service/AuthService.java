@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
+/** Gère l'inscription, la connexion et la récupération du profil courant. */
 @Service
 public class AuthService {
 
@@ -40,6 +41,13 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Crée un compte utilisateur et génère son jeton d'authentification.
+     *
+     * @param request données nécessaires à l'inscription
+     * @return le jeton de l'utilisateur créé
+     * @throws EmailAlreadyRegisteredException si l'adresse e-mail est déjà utilisée
+     */
     @Transactional
     public TokenResponse register(RegisterRequest request) {
         String email = normalizeEmail(request.email());
@@ -59,6 +67,13 @@ public class AuthService {
         return new TokenResponse(jwtService.generateToken(savedUser.getEmail()));
     }
 
+    /**
+     * Vérifie les identifiants et génère un jeton d'authentification.
+     *
+     * @param request identifiants de connexion
+     * @return le jeton de l'utilisateur authentifié
+     * @throws InvalidCredentialsException si les identifiants sont invalides
+     */
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
         String email = normalizeEmail(request.email());
@@ -72,6 +87,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * Récupère le profil associé à une adresse e-mail.
+     *
+     * @param email adresse e-mail de l'utilisateur
+     * @return le profil utilisateur destiné à l'API
+     * @throws UserNotFoundException si aucun utilisateur ne correspond à cette adresse
+     */
     @Transactional(readOnly = true)
     public UserResponse getUser(String email) {
         User user = userRepository.findByEmail(normalizeEmail(email))

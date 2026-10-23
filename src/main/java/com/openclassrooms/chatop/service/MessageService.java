@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+/** Gère l'envoi des messages associés aux locations. */
 @Service
 public class MessageService {
 
@@ -33,6 +34,16 @@ public class MessageService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Enregistre un message après avoir vérifié l'identité de son auteur.
+     *
+     * @param request contenu du message et identifiants de l'utilisateur et de la location
+     * @param authenticatedEmail adresse e-mail de l'utilisateur authentifié
+     * @return une confirmation de l'envoi
+     * @throws UserNotFoundException si l'utilisateur authentifié n'existe pas
+     * @throws ForbiddenOperationException si l'identifiant fourni ne correspond pas à l'utilisateur authentifié
+     * @throws RentalNotFoundException si la location n'existe pas
+     */
     @Transactional
     public MessageResponse send(MessageRequest request, String authenticatedEmail) {
         User user = userRepository.findByEmail(authenticatedEmail)

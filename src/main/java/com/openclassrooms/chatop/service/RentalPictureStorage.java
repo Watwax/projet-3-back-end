@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
+/** Valide et stocke sur disque les images associées aux locations. */
 @Service
 public class RentalPictureStorage {
 
@@ -29,6 +30,14 @@ public class RentalPictureStorage {
         this.uploadDirectory = Path.of(uploadDirectory).toAbsolutePath().normalize();
     }
 
+    /**
+     * Vérifie une image puis l'enregistre avec un nom généré.
+     *
+     * @param picture fichier image envoyé par le client
+     * @return chemin public de l'image enregistrée
+     * @throws InvalidRequestException si le fichier est absent, vide ou n'est pas une image prise en charge
+     * @throws UncheckedIOException si le fichier ne peut pas être lu ou enregistré
+     */
     public String store(MultipartFile picture) {
         if (picture == null || picture.isEmpty()) {
             throw new InvalidRequestException("A rental picture is required");
@@ -64,6 +73,11 @@ public class RentalPictureStorage {
         }
     }
 
+    /**
+     * Renvoie le dossier absolu utilisé pour le stockage des images.
+     *
+     * @return dossier de stockage normalisé
+     */
     public Path getUploadDirectory() {
         return uploadDirectory;
     }
